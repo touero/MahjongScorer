@@ -66,7 +66,7 @@ const users = ref([
   align-items: center;
   justify-content: center;
   text-align: center;
-  border: none; /* 去掉边框 */
+  border: none;
 }
 
 .user-image-container {
