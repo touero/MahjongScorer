@@ -4,6 +4,7 @@
       <view class="table-row">
         <text class="table-cell">User</text>
         <text class="table-cell">Score</text>
+        <text class="table-cell">Give</text>
         <text class="table-cell">Action</text>
       </view>
     </view>
@@ -15,10 +16,16 @@
             <text class="user-name">{{ user.name }}</text>
           </view>
         </view>
-        <text class="table-cell">{{ user.score }}</text>
+        <text class="table-cell" style="font-size: 70rpx;" >{{ user.name === currentUser.name ? currentUser.score : user.score }}</text>
+        <view class="table-cell">
+          <input 
+            :disabled="currentUser.name === user.name" 
+            v-model="user.giveValue" 
+          />
+        </view>
         <view class="table-cell">
           <view class="user-image-container">
-            <button>
+            <button @click="giveScore(user)">
               <image class="action-icon" src="/static/give.png" mode="aspectFit" />
             </button>
           </view>
@@ -29,15 +36,38 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 
-const users = ref([
-  { name: 'User1', score: 100, image: '/static/usericon1.jpg' },
-  { name: 'User2', score: 95, image: '/static/usericon2.jpg' },
-  { name: 'User3', score: 90, image: '/static/usericon3.jpg' },
-  { name: 'User4', score: 85, image: '/static/usericon4.png' }
-])
+interface User {
+  name: string;
+  score: number;
+  image: string;
+  giveValue?: string;
+}
+
+const users = ref<User[]>([
+  { name: 'User1', score: 0, image: '/static/usericon1.jpg' },
+  { name: 'User2', score: 0, image: '/static/usericon2.jpg' },
+  { name: 'User3', score: 0, image: '/static/usericon3.jpg' },
+  { name: 'User4', score: 0, image: '/static/usericon4.png' }
+]);
+
+const currentUser = reactive<User>({ 
+  name: 'User1', 
+  score: 0, 
+  image: '/static/usericon1.jpg' 
+});
+
+const giveScore = (user: User) => {
+  const amount = parseInt(user.giveValue || '0');
+  if (!isNaN(amount) && amount > 0) {
+    user.score += amount;
+    currentUser.score -= amount; // 更新 currentUser 的分数
+    user.giveValue = ''; // 清空输入框
+  } 
+}
 </script>
+
 
 <style>
 .text-area {
@@ -66,7 +96,7 @@ const users = ref([
   align-items: center;
   justify-content: center;
   text-align: center;
-  border: none; /* 去掉边框 */
+  border: none;
 }
 
 .user-image-container {
@@ -103,4 +133,18 @@ button {
   outline: none; 
   padding: 0;
 }
+
+input {
+  width: 60%;
+  padding: 10rpx;
+  border: 1px solid #ccc;
+  border-radius: 10rpx;
+  outline: none;
+}
+
+input:focus {
+  border-color: #007bff; 
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
 </style>
